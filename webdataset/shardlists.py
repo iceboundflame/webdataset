@@ -213,6 +213,16 @@ class MultiShardSample(IterableDataset):
         return result
 
     def __iter__(self):
+        self.epoch += 1
+        seed = utils.make_seed(
+            utils.pytorch_worker_seed(),
+            self.epoch,
+            os.getpid(),
+            time.time_ns(),
+            os.urandom(4),
+        )
+        self.set_epoch(seed)
+
         shards = self.get_shards_for_epoch()
         for shard in shards:
             yield dict(url=shard)
